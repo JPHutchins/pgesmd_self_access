@@ -1,2 +1,5 @@
 /venv
 */__pycache__
+/pgesmd_self_access.egg-info
+/dist
+/build

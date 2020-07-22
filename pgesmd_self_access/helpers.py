@@ -12,10 +12,8 @@ from io import StringIO
 
 _LOGGER = logging.getLogger(__name__)
 
-PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-def get_auth_file(auth_path=f"{PROJECT_PATH}/auth/auth.json"):
+def get_auth_file(auth_path=f"{os.getcwd()}/auth/auth.json"):
     """Try to open auth.json and return tuple."""
     try:
         with open(auth_path) as auth:
@@ -127,10 +125,10 @@ def parse_espi_data(xml, ns="{http://naesb.org/espi}"):
 def save_espi_xml(self, xml_data, filename=None):
     """Save ESPI XML to a file named by timestamp or filename key."""
     if filename:
-        save_name = f"{PROJECT_PATH}/data/espi_xml/{filename}.xml"
+        save_name = f"{os.getcwd()}/data/espi_xml/{filename}.xml"
     else:
         timestamp = time.strftime("%y.%m.%d %H:%M:%S", time.localtime())
-        save_name = f"{PROJECT_PATH}/data/espi_xml/{timestamp}.xml"
+        save_name = f"{os.getcwd()}/data/espi_xml/{timestamp}.xml"
 
     with open(save_name, "w") as file:
         file.write(xml_data)

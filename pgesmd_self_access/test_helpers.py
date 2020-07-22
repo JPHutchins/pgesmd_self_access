@@ -3,8 +3,6 @@
 import unittest
 import os
 import time
-from pstats import Stats
-import cProfile
 import json
 
 from .helpers import get_auth_file, get_bulk_id_from_xml, parse_espi_data

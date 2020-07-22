@@ -12,8 +12,6 @@ from pytz import timezone
 
 from .helpers import get_auth_file
 
-PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 logging.basicConfig(
     level=os.environ.get("LOGLEVEL", "DEBUG"),
     format="%(levelname)s - %(asctime)s - %(message)s",
@@ -319,19 +317,21 @@ class SelfAccessApi:
             return False
 
     @classmethod
-    def auth(self):
+    def auth(self, path=None):
         """Authorize and return the API instance using get_auth_file."""
-        auth = get_auth_file()
+        if not path:
+            auth = get_auth_file()
+        else:
+            auth = get_auth_file(path)
         return self(*auth)
+
 
 class PgeRegister:
     """Complete the PGE Share My Data API Connectivity Tests."""
 
     # refer to: https://www.pge.com/en_US/residential/save-energy-money/analyze-your-usage/your-usage/view-and-share-your-data-with-smartmeter/reading-the-smartmeter/share-your-data/third-party-companies/testing-details.page
 
-    def __init__(
-        self, method=get_auth_file, auth_path=f"{PROJECT_PATH}/auth/auth.json"
-    ):
+    def __init__(self, method=get_auth_file, auth_path=f"{os.getcwd()}/auth/auth.json"):
         self.auth = method(auth_path)
         self._api = SelfAccessApi(*self.auth)
         self.access_token = None

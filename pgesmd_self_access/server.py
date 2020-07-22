@@ -8,8 +8,6 @@ import os
 
 from .helpers import parse_espi_data, get_bulk_id_from_xml
 
-PROJECT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 _LOGGER = logging.getLogger(__name__)
 
 
