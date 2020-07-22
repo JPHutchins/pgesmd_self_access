@@ -33,7 +33,7 @@ Create a file `~/pgesmd_self_access/auth/auth.json`.  The JSON needs these keys:
 You may test some commands in the REPL to verify that everything is set up correctly.
 ```
 from pgesmd_self_access.api import SelfAccessApi
-pge_api = SelfAccessApi.auth( < full path to the auth.json > ) for example, /home/jp/pgesmd_self_access/auth/auth.json
+pge_api = SelfAccessApi.auth( < full path to the auth.json > ) # for example, /home/jp/pgesmd_self_access/auth/auth.json
 pge_api.get_service_status()
 ```
 In order to listen for the messages from PGE you will need to forward port 443 to the server that this module runs at (default) port 7999.
