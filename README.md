@@ -33,7 +33,7 @@ Create a file `~/pgesmd_self_access/auth/auth.json`:
 
 ```
 {
-  "third_party_id" : string, from PGE
+  "third_party_id" : string, from PGE - use "" if unknown
   "client_id" : string, from PGE after completing registration
   "client_secret" : string, from PGE after completing registration
   "cert_crt_path" : string, like above
@@ -49,7 +49,14 @@ pge_api = SelfAccessApi.auth( < full path to the auth.json > ) # for example, /h
 pge_api.get_service_status()
 ```
 
-In order to listen for the messages from PGE you will need to forward port 443 to the server that this module runs at (default) port 7999.
+Complete the testing as required by PG&E:
+```
+from pgesmd_self_access.api import PgeRegister
+pge_reg = PgeRegister() # this will look for your auth.json at ./auth/auth.json
+pge_reg.complete_testing() # hopefully this succeeds - if not check the SMD Portal and auth
+```
+PGE SMD will send data to the notification URI that you specified when you registered. Login to the PGE SMD portal to change it if needed.
+In order to listen for the messages from PGE you will need to forward port 443 to the server that this module runs at (default) port 7999. 
 Once it is open you can start the server:
 
 ```
