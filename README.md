@@ -1,7 +1,11 @@
 ## PG&E Share My Data API for Self Access
 
-This python module is a helper for the Share My Data API which allows the utility customer to download their meter data using the Energy Services Provider Interface (ESPI), part of the Green Button standard.
-[Click here to register with PG&E as a Self Access user](https://www.pge.com/en_US/residential/save-energy-money/analyze-your-usage/your-usage/view-and-share-your-data-with-smartmeter/reading-the-smartmeter/share-your-data/third-party-companies/get-started.page)
+This python module is a helper for the Share My Data API which allows the utility customer to download their meter data using the Energy Services Provider Interface (ESPI), part of the Green Button standard. 
+It is used as a development tool for [Open Energy View](https://github.com/JPHutchins/open-energy-view).
+
+[View your PG&E data using the public beta version of Open Energy View](https://www.openenergyview.com)
+
+[Register with PG&E as a Self Access user](https://www.pge.com/en_US/residential/save-energy-money/analyze-your-usage/your-usage/view-and-share-your-data-with-smartmeter/reading-the-smartmeter/share-your-data/third-party-companies/get-started.page)
 
 ## Install
 
