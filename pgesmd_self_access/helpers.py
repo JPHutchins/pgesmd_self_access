@@ -62,7 +62,7 @@ def get_bulk_id_from_xml(
     for i in range(len(link) - 1, 0, -1):
         if link[i] == "/":
             break
-    return int(link[i + 1 :])
+    return int(link[i + 1:])
 
 
 def parse_espi_data(xml, ns="{http://naesb.org/espi}"):
@@ -79,7 +79,7 @@ def parse_espi_data(xml, ns="{http://naesb.org/espi}"):
         missing hour is filled with the average of the previous and following
         values in order to maintain 24 hours per day.
     """
-    _LOGGER.debug(f"Parsing the XML.")
+    _LOGGER.debug("Parsing the XML.")
 
     # Find initial values
     root = ET.fromstring(xml)
