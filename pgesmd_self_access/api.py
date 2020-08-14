@@ -74,7 +74,10 @@ class SelfAccessApi:
         if service_status_uri:
             self.service_status_uri = service_status_uri
         else:
-            self.service_status_uri = "https://api.pge.com/GreenButtonConnect/espi/1_1/resource/ReadServiceStatus"
+            self.service_status_uri = (
+                "https://api.pge.com/GreenButtonConnect"
+                "/espi/1_1/resource/ReadServiceStatus"
+            )
 
         self.bulk_resource_uri = (
             f"{self.utility_uri}{self.api_uri}"
@@ -183,7 +186,11 @@ class SelfAccessApi:
         return False
 
     def request_date_data(self, date):
-        """Return True upon successful asynchronous request."""
+        """Return True upon successful asynchronous request.
+
+        Arguments:
+            date -- date string in format %Y-%m-%d
+        """
         if self.need_token():
             self.get_token()
 
@@ -221,7 +228,12 @@ class SelfAccessApi:
         return False
 
     def request_historical_data(self, days=730, end_date=None):
-        """Return True upon successful asynchronous request."""
+        """Get the historical usage data.
+
+        Arguments:
+            days -- Optional; integer, how many days back (Default: 730)
+            end_date -- Optional; date string to stop at (Default: today)
+        """
         if self.need_token():
             self.get_token()
 
@@ -256,8 +268,12 @@ class SelfAccessApi:
         )
         return False
 
-    def get_espi_data(self, resource_uri, retried=False):
-        """Get the ESPI data from the API."""
+    def get_espi_data(self, resource_uri, _retried=False):
+        """Get the ESPI data from the API.
+
+        Arguments:
+            resource_uri -- string, the URI parsed from a PGE notification
+        """
         if self.need_token():
             self.get_token()
 
@@ -269,14 +285,14 @@ class SelfAccessApi:
         if str(response.status_code) == "200":
             xml_data = response.text
             return xml_data
-        elif str(response.status_code) == "403" and not retried:
+        elif str(response.status_code) == "403" and not _retried:
             _LOGGER.error(
                 f"get_espi_data failed. Refreshing token."
                 f"{resource_uri} responded: "
                 f"{response.status_code}: {response.text}"
             )
             if self.get_token():
-                self.get_espi_data(resource_uri, retried=True)
+                self.get_espi_data(resource_uri, _retried=True)
         elif str(response.status_code) == "403":
             _LOGGER.error(
                 f"get_espi_data failed. Check auth file."
@@ -327,12 +343,30 @@ class SelfAccessApi:
 
 
 class PgeRegister:
-    """Complete the PGE Share My Data API Connectivity Tests."""
+    """Complete the PGE Share My Data API Connectivity Tests.
 
-    # refer to: https://www.pge.com/en_US/residential/save-energy-money/analyze-your-usage/your-usage/view-and-share-your-data-with-smartmeter/reading-the-smartmeter/share-your-data/third-party-companies/testing-details.page
+    If something goes wrong with the auth the constructor will revert to a command
+    line input to get the auth data.
+
+    Keyword arguments:
+    method -- Optional; a function that returns the tuple:
+        ([Third Party ID] string - use "" if unknown,
+         [Client ID] string,
+         [Client Secret] string,
+         [Full path to certificate] string,
+         [Full path to private key] string)
+        Default is get_auth_file()
+    auth_path -- the location of auth.json (default ./auth/auth.json)
+    """
+
+    # refer to: https://www.pge.com/en_US/residential/save-energy-money/analyze-your-usage
+    # /your-usage/view-and-share-your-data-with-smartmeter/reading-the-smartmeter
+    # /share-your-data/third-party-companies/testing-details.page
 
     def __init__(self, method=get_auth_file, auth_path=f"{os.getcwd()}/auth/auth.json"):
         self.auth = method(auth_path)
+        if not self.auth or len(self.auth) != 5:
+            self.auth = self.get_credentials()
         self._api = SelfAccessApi(*self.auth)
         self.access_token = None
         self.testing_completed = False
@@ -348,20 +382,9 @@ class PgeRegister:
         )
 
     def get_token(self):
-        """Get the access token from the PGE API.
+        """Get the access token from the PGE API."""
 
-        Keyword argument:
-        method -- a function that returns the tuple:
-            ([Third Party ID] string - use "" if unknown,
-             [Client ID] string,
-             [Client Secret] string,
-             [Full path to certificate] string,
-             [Full path to private key] string)
-             Default is get_auth_file() which will look in ./auth/auth.json
-        """
-
-        self._api.token_uri = "https://api.pge.com/datacustodian"
-        "/test/oauth/v2/token"
+        self._api.token_uri = "https://api.pge.com/datacustodian/test/oauth/v2/token"
 
         print(f"Requesting client access token from {self._api.token_uri}")
         self.access_token = self._api.get_token()
@@ -395,8 +418,7 @@ class PgeRegister:
             return False
 
     def get_sample_data(self):
-        _uri = "https://api.pge.com/GreenButtonConnect"
-        "/espi/1_1/resource/DownloadSampleData"
+        _uri = "https://api.pge.com/GreenButtonConnect/espi/1_1/resource/DownloadSampleData"
 
         print(f"Requesting sample data from {_uri}")
 
@@ -405,7 +427,7 @@ class PgeRegister:
         if not response:
             print(f"No response from {_uri}")
             return False
-        if not str(response.status_code) == "200":
+        if str(response.status_code) != "200" or str(response.status_code) != "202":
             print(f"Error: {response.status_code}, {response.text}")
             return False
         self.testing_completed = True
@@ -417,7 +439,7 @@ class PgeRegister:
 
         header_params = {"Authorization": f"Bearer {self.access_token}"}
         response = requests.get(
-            "https://api.pge.com/GreenButtonConnect/espi/1_1" "/resource/Authorization",
+            "https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Authorization",
             headers=header_params,
             cert=self._api.cert,
         )
@@ -426,7 +448,7 @@ class PgeRegister:
             print("No response from server.")
         if not str(response.status_code) == "200":
             print(f"Error: {response.status_code}, {response.text}")
-            return ""
+            return
 
         def search_xml_for_id(root, tag, text, n, result):
             for child in root:
@@ -439,7 +461,25 @@ class PgeRegister:
 
         root = ET.fromstring(response.text)
         tag = "{http://naesb.org/espi}resourceURI"
-        text = "https://api.pge.com/GreenButtonConnect"
-        "/espi/1_1/resource/Batch/Bulk/"
+        text = "https://api.pge.com/GreenButtonConnect/espi/1_1/resource/Batch/Bulk/"
         return search_xml_for_id(root, tag, text, len(text), None)
 
+    def complete_testing(self):
+        self.get_token()
+        if not self.access_token:
+            print("Request for access_token failed, stopping complete_testing()")
+            return
+
+        if not self.get_service_status():
+            print("Service status is not online, stopping complete_testing()")
+            return
+
+        if not self.get_sample_data():
+            print("Request for sample data failed, stopping complete_testing()")
+            return
+
+        print("Testing completed.")
+        bulk_id = self.get_third_party_id()
+        if bulk_id:
+            print(f"Your Bulk ID / Bulk Resource ID / Third Party ID is {bulk_id}")
+        return
