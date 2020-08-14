@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pgesmd_self_access",
-    version="0.0.5",
+    version="0.0.6",
     author="J.P. Hutchins",
     author_email="jphutchins@gmail.com",
     description="PG&E Share My Data API for Self Access users",
@@ -18,6 +18,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=["pytz", "requests",],
+    install_requires=["pytz", "requests"],
     python_requires=">=3.8",
 )
