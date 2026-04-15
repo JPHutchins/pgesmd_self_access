@@ -127,8 +127,13 @@ def save_espi_xml(self, xml_data, filename=None):
     if filename:
         save_name = f"{os.getcwd()}/data/espi_xml/{filename}.xml"
     else:
-        timestamp = time.strftime("%y.%m.%d %H:%M:%S", time.localtime())
+        timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
         save_name = f"{os.getcwd()}/data/espi_xml/{timestamp}.xml"
+    
+    # Create the directory if it doesn't exist
+    directory = os.path.dirname(save_name)
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
 
     with open(save_name, "w") as file:
         file.write(xml_data)
